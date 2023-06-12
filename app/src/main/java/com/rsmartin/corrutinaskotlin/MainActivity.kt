@@ -7,13 +7,16 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.lang.StringBuilder
 import java.time.Instant
+import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +35,10 @@ class MainActivity : AppCompatActivity() {
         //dispatcher()
         //launch()
         //exampleJob()
-        //asyncAwait()
-        asyncAwaitDeferred()
+        //println(measureTimeMillis { asyncAwait() }.toString())
+        //println(measureTimeMillis { asyncAwaitDeferred() }.toString())
+        //println(measureTimeMillis { withContextExample() }.toString())
+        cancelCoroutine()
     }
 
     private fun setUpView() {
@@ -158,12 +163,9 @@ class MainActivity : AppCompatActivity() {
     Permite escribir de forma sincrona codigo que se ejecuta asincronamente
     */
     fun asyncAwait() = runBlocking {
-        Log.d(TAG, System.currentTimeMillis().toString())
         val num1 = async { calculateHard() }.await()
-        Log.d(TAG, System.currentTimeMillis().toString())
         val num2 = async { calculateHard() }.await()
-        Log.d(TAG, System.currentTimeMillis().toString())
-        Log.d(TAG, "resultado: ${num1 + num2}")
+        println("resultado: ${num1 + num2}")
     }
 
     suspend fun calculateHard(): Int {
@@ -174,14 +176,38 @@ class MainActivity : AppCompatActivity() {
     /*
     Deferred es devuelto por Async-await, es un futuro cancelable sin bloqueo.
     Deferred es como un Job, la forma de obtenerlo es por el await
-     */
+    */
     fun asyncAwaitDeferred() = runBlocking {
-        Log.d(TAG, System.currentTimeMillis().toString())
         val num1: Deferred<Int> = async { calculateHard() }
-        Log.d(TAG, System.currentTimeMillis().toString())
         val num2: Deferred<Int> = async { calculateHard() }
-        Log.d(TAG, System.currentTimeMillis().toString())
         val result: Int = num1.await() + num2.await()
-        Log.d(TAG, "resultado: ${result}")
+        println("resultado: ${result}")
+    }
+
+    /*
+    WithContext ejecuta la linea y hasta no obtener resultado se detiene.
+    */
+    fun withContextExample() = runBlocking {
+        val num1 = withContext(Dispatchers.IO) { calculateHard() }
+        val num2 = withContext(Dispatchers.IO) { calculateHard() }
+        val result: Int = num1 + num2
+        println("resultado: ${result}")
+    }
+
+    /*
+    Cancelar corrutinas
+    */
+    fun cancelCoroutine() {
+        runBlocking {
+            val job: Job = launch {
+                repeat(1000) { i ->
+                    println("job: $i")
+                    delay(500L)
+                }
+            }
+            delay(1400)
+            job.cancel()
+            println("main cansado de esperar")
+        }
     }
 }
