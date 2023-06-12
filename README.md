@@ -8,3 +8,4 @@ Launch
 Scope
 Job
 Async-Await
+Deferred

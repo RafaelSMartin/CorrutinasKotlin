@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
@@ -29,7 +31,9 @@ class MainActivity : AppCompatActivity() {
 
         //dispatcher()
         //launch()
-        exampleJob()
+        //exampleJob()
+        //asyncAwait()
+        asyncAwaitDeferred()
     }
 
     private fun setUpView() {
@@ -114,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /*
-    Launch lanza una corrutina sin bloquear el hilo
+    Launch lanza una corrutina sin bloquear el hilo y nos olvidamos de lo q devuelva
     Devuelve una referencia de la corrutina como Job
     La corrutina es cancelada cuando el resultado del Job es cancelado
     */
@@ -147,5 +151,37 @@ class MainActivity : AppCompatActivity() {
         }
         Log.d(TAG, "Tarea3 " + Thread.currentThread().name + Instant.now())
         job.cancel() // no sale Tarea2 porque se cancela antes de terminar
+    }
+
+    /*
+    Async permite ejecutar de forma asincrona y con await esperar el resultado del metodo dentro de awayt
+    Permite escribir de forma sincrona codigo que se ejecuta asincronamente
+    */
+    fun asyncAwait() = runBlocking {
+        Log.d(TAG, System.currentTimeMillis().toString())
+        val num1 = async { calculateHard() }.await()
+        Log.d(TAG, System.currentTimeMillis().toString())
+        val num2 = async { calculateHard() }.await()
+        Log.d(TAG, System.currentTimeMillis().toString())
+        Log.d(TAG, "resultado: ${num1 + num2}")
+    }
+
+    suspend fun calculateHard(): Int {
+        delay(2000)
+        return 15
+    }
+
+    /*
+    Deferred es devuelto por Async-await, es un futuro cancelable sin bloqueo.
+    Deferred es como un Job, la forma de obtenerlo es por el await
+     */
+    fun asyncAwaitDeferred() = runBlocking {
+        Log.d(TAG, System.currentTimeMillis().toString())
+        val num1: Deferred<Int> = async { calculateHard() }
+        Log.d(TAG, System.currentTimeMillis().toString())
+        val num2: Deferred<Int> = async { calculateHard() }
+        Log.d(TAG, System.currentTimeMillis().toString())
+        val result: Int = num1.await() + num2.await()
+        Log.d(TAG, "resultado: ${result}")
     }
 }
