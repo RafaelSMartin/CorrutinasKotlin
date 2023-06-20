@@ -5,8 +5,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -48,11 +51,23 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         // Cancelamos sin necesitar de terminar la operacion
-        runBlocking {
+        /*runBlocking {
             withTimeoutOrNull(2500){
                 firstFlow().collect { value -> println(value) }
             }
             println("Finalizado")
+        }*/
+
+        /*runBlocking {
+            //secondFlow().collect { value -> println(value) }
+            thirdFlow().collect { value -> println(value) }
+        }*/
+
+        // Operador Map, convierte un flow en otro flow
+        runBlocking {
+            (1..3).asFlow()
+                .map { request -> performRequest(request) }
+                .collect { response -> println(response) }
         }
     }
 
@@ -98,5 +113,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Un segundo constructor para Flow
+    fun secondFlow(): Flow<Int> {
+        return flowOf(1, 2, 3)
+    }
+
+    // Una tercera constructor para Flow
+    fun thirdFlow(): Flow<Int> {
+        return (1..3).asFlow()
+    }
+
+    /*
+    Devuelve un string con el numero entero de request
+     */
+    suspend fun performRequest(request: Int): String {
+        delay(1000)
+        return "response $request"
+    }
 
 }
