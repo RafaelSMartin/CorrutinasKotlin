@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.*
 
 class MainActivity : AppCompatActivity() {
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         //Lanza una corrutina asincrona y luego llama al flow con collect
-        runBlocking {
+        /*runBlocking {
             launch {
                 for(j in 1..3) {
                     println("No estoy bloqueado $j")
@@ -34,6 +35,24 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             firstFlow().collect { value -> println(value) }
+        }*/
+
+        //Cuando ejecutamos collect se empieza a ejecutar la funcion de emision cold flow
+        /*runBlocking {
+            println("Llmando Flow...")
+            val flow = firstFlow()
+            println("Collect...")
+            flow.collect { value -> println(value) }
+            println("Collect again...")
+            flow.collect { value -> println(value) }
+        }*/
+
+        // Cancelamos sin necesitar de terminar la operacion
+        runBlocking {
+            withTimeoutOrNull(2500){
+                firstFlow().collect { value -> println(value) }
+            }
+            println("Finalizado")
         }
     }
 
@@ -65,10 +84,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     /*
-    Flow es un call asincrono data string que se ejecuta de manera secuencial en la misma
+    Flow es un call asincrono data stream que se ejecuta de manera secuencial en la misma
     corrutina y emite valores y finaliza normalmente con el estado completado o lanzando
-    una excepcion, se focaliza en un data string que emite valores secuencialmente.
-    Flow necesita siempre un constructor
+    una excepcion, se focaliza en un data stream que emite valores secuencialmente.
+    Flow necesita siempre un constructor, si no se llama a collect no se ejecuta nada del flow
     */
 
     // Emite un numero cada segundo
@@ -78,4 +97,6 @@ class MainActivity : AppCompatActivity() {
             emit(i)
         }
     }
+
+
 }
