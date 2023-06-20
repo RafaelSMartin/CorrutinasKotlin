@@ -41,15 +41,5 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        //Usamos el hilo principal, pero cambiamos a withcontext con IO para bloquear
-        //la corrutina pero no el hilo principal.
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = withContext(Dispatchers.IO) {
-                //mi llamada a bbdd o retrofit
-            }
-            //Hacer lo q quisieramos incluso actualizar la ui
-            //aqui ya estamos en el hilo principal de nuevo
-        }
     }
 }
