@@ -12,6 +12,6 @@ Deferred<br>
 WithContext<br>
 Cancel coroutine<br>
 ----------------------<br>
-List and Sequences
-List coroutine
-Flow
+List and Sequences<br>
+List coroutine<br>
+Flow<br>
