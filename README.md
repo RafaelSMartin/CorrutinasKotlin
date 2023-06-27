@@ -21,3 +21,7 @@ Flow contructors<br>
 Map<br>
 Filter<br>
 Transform<br>
+Terminal toList<br>
+Terminal first<br>
+Terminal reduce<br>
+

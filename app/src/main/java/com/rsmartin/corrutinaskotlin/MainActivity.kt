@@ -8,9 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.reduce
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -82,13 +86,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Operador Transforme, es el mas general y mas opciones nos da, podemos imitar otros operadores
-        runBlocking {
+        /*runBlocking {
             (1..3).asFlow()
                 .transform { request ->
                     emit("Making request $request")
                     emit(performRequest(request))
                 }
                 .collect { response -> println(response) }
+        }*/
+
+        //Operador Take, cancela el flow cuando alcanza el limite que le indicamos
+        /*runBlocking {
+            (1..3).asFlow()
+                .take(2)
+                .collect { response -> println(response) }
+        }*/
+
+        //Operador terminal toList, pasar a una lista el flow que recibimos
+        runBlocking {
+            var list: List<Int> = (1..3).asFlow().toList()
+            println(list)
+        }
+
+        //Operador terminal first, coge el primer elemento del flow y el resto los desecha
+        runBlocking {
+            var num = (6..90).asFlow().first()
+            println(num)
+        }
+
+        //Operador terminal reduce, opera con los datos de los flow
+        // Acumula valor comenzando con el primer elemento y aplicando la operación al valor acumulador actual y cada elemento.
+        // en este caso coge el primer flow y lo suma con el sig
+        runBlocking {
+            var num = (1..3).asFlow()
+                .reduce { a, b -> a+b }
+            println(num)
         }
     }
 
