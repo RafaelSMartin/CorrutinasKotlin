@@ -7,9 +7,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -64,9 +66,28 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         // Operador Map, convierte un flow en otro flow
-        runBlocking {
+        /*runBlocking {
             (1..3).asFlow()
                 .map { request -> performRequest(request) }
+                .collect { response -> println(response) }
+        }*/
+
+        // Operador Filter, indicamos una expresion logica para filtrar y
+        // devolverlo como flow, se puede compaginar con map
+        runBlocking {
+            (1..3).asFlow()
+                .filter { request -> request > 1 }
+                .map { request -> performRequest(request) }
+                .collect { response -> println(response) }
+        }
+
+        //Operador Transforme, es el mas general y mas opciones nos da, podemos imitar otros operadores
+        runBlocking {
+            (1..3).asFlow()
+                .transform { request ->
+                    emit("Making request $request")
+                    emit(performRequest(request))
+                }
                 .collect { response -> println(response) }
         }
     }

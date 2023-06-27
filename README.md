@@ -19,3 +19,5 @@ Cold Flow<br>
 Cancel Flow<br>
 Flow contructors<br>
 Map<br>
+Filter<br>
+Transform<br>
