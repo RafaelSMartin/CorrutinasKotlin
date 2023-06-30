@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.*
+import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,12 +82,12 @@ class MainActivity : AppCompatActivity() {
 
         // Operador Filter, indicamos una expresion logica para filtrar y
         // devolverlo como flow, se puede compaginar con map
-        runBlocking {
+        /*runBlocking {
             (1..3).asFlow()
                 .filter { request -> request > 1 }
                 .map { request -> performRequest(request) }
                 .collect { response -> println(response) }
-        }
+        }*/
 
         //Operador Transforme, es el mas general y mas opciones nos da, podemos imitar otros operadores
         /*runBlocking {
@@ -103,24 +107,79 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         //Operador terminal toList, pasar a una lista el flow que recibimos
-        runBlocking {
+        /*runBlocking {
             var list: List<Int> = (1..3).asFlow().toList()
             println(list)
-        }
+        }*/
 
         //Operador terminal first, coge el primer elemento del flow y el resto los desecha
-        runBlocking {
+        /*runBlocking {
             var num = (6..90).asFlow().first()
             println(num)
-        }
+        }*/
 
         //Operador terminal reduce, opera con los datos de los flow
         // Acumula valor comenzando con el primer elemento y aplicando la operación al valor acumulador actual y cada elemento.
         // en este caso coge el primer flow y lo suma con el sig
-        runBlocking {
+        /*runBlocking {
             var num = (1..3).asFlow()
                 .reduce { a, b -> a+b }
             println(num)
+        }*/
+
+        //Flow es secuencial, si no pasa filter no llega a map ni collect
+        /*runBlocking {
+            (1..5).asFlow()
+                .filter { i->
+                    println("Filtrado $i")
+                    i%2 == 0
+                }
+                .map { i->
+                    println("Map $i")
+                    "String $i"
+                }
+                .collect { i->
+                    println("Collect $i")
+                }
+        }*/
+
+        //Buffer
+        /*runBlocking {
+            val time = measureTimeMillis {
+                firstFlow()
+                    .buffer()
+                    .collect { value->
+                        delay(3000)
+                        println(value)
+                    }
+            }
+            println("$time ms")
+        }*/
+
+        //Conflate, procesa el primer y ultimo valor
+        /*runBlocking {
+            val time = measureTimeMillis {
+                firstFlow()
+                    .conflate()
+                    .collect { value->
+                        delay(3000)
+                        println(value)
+                    }
+            }
+            println("$time ms")
+        }*/
+
+        //CollectLatest, procesa el ultimo valor
+        runBlocking {
+            val time = measureTimeMillis {
+                firstFlow()
+                    .collectLatest { value->
+                        println("Collecting $value")
+                        delay(3000)
+                        println("Finalizado $value")
+                    }
+            }
+            println("$time ms")
         }
     }
 

@@ -24,4 +24,8 @@ Transform<br>
 Terminal toList<br>
 Terminal first<br>
 Terminal reduce<br>
+Flow is secuential<br>
+Buffer<br>
+Conflate<br>
+CollectLastest<br>
 
