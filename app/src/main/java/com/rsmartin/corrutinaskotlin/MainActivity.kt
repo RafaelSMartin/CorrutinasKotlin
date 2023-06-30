@@ -12,13 +12,17 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -170,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         }*/
 
         //CollectLatest, procesa el ultimo valor
-        runBlocking {
+        /*runBlocking {
             val time = measureTimeMillis {
                 firstFlow()
                     .collectLatest { value->
@@ -180,6 +184,37 @@ class MainActivity : AppCompatActivity() {
                     }
             }
             println("$time ms")
+        }*/
+
+        // Zip, combina los valores correspondientes de dos flujos
+        /*val nums: Flow<Int> = (1..3).asFlow()
+        val strs: Flow<String> = flowOf("Uno","Dos","Tres")
+        runBlocking {
+            nums.zip(strs) {
+                a,b -> "Zip $a -> $b"
+            }.collect { println(it) }
+        }*/
+
+        /*runBlocking {
+            var ejemplo = (1..3).asFlow().map { requestFlow(it) }
+        }*/
+
+        //FlatMapConcat, espera que se complete el flujo interno antes de comenzar a recopilar el siguiente
+        /*runBlocking {
+            val startTime = System.currentTimeMillis()
+            (1..3).asFlow()
+                .onEach { delay(100) }
+                .flatMapConcat { requestFlow(it) }
+                .collect { value -> println("$value at ${System.currentTimeMillis() - startTime} ms from start") }
+        }*/
+
+        //FlatMapMerge,
+        runBlocking {
+            val startTime = System.currentTimeMillis()
+            (1..3).asFlow()
+                .onEach { delay(100) }
+                .flatMapMerge { requestFlow(it) }
+                .collect { value -> println("$value at ${System.currentTimeMillis() - startTime} ms from start") }
         }
     }
 
@@ -241,6 +276,12 @@ class MainActivity : AppCompatActivity() {
     suspend fun performRequest(request: Int): String {
         delay(1000)
         return "response $request"
+    }
+
+    fun requestFlow(i : Int): Flow<String> = flow {
+        emit("$i: First")
+        delay(500)
+        emit("$i: Second")
     }
 
 }
