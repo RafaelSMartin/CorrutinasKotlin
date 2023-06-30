@@ -28,4 +28,7 @@ Flow is secuential<br>
 Buffer<br>
 Conflate<br>
 CollectLastest<br>
+Zip<br>
+FlatMapConcat<br>
+FlatMapMerge<br>
 
